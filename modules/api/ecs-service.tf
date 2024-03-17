@@ -1,6 +1,6 @@
 resource "aws_ecs_service" "ecs_service" {
   name = var.service_name
-  cluster = aws_ecs_cluster.ecs_cluster.arn
+  cluster = var.ecs_cluster_name
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
   desired_count = var.ecs_service_count
 
@@ -11,7 +11,7 @@ resource "aws_ecs_service" "ecs_service" {
 resource "aws_ecs_task_definition" "ecs_task_definition" {
   family = var.family_name
   network_mode = "bridge"
-  task_role_arn = aws_iam_role.ecs_task_role.arm
-  execution_role_arn = aws_iam_role.ecs_task_role.arm
+  task_role_arn = aws_iam_role.ecs_task_role.arn
+  execution_role_arn = aws_iam_role.ecs_task_role.arn
   container_definitions = var.container_definition
 }

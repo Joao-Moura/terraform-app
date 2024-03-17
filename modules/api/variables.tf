@@ -1,3 +1,8 @@
+variable "ecs_cluster_name" {
+  type        = string
+  description = "Nome do cluster ecs"
+}
+
 variable "service_name" {
   type        = string
   description = "Nome do serviço ecs"
