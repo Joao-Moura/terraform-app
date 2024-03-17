@@ -1,0 +1,29 @@
+[
+    {
+        "cpu": 256,
+        "memory": 512,
+        "image": "elixir:latest",
+        "name": "api",
+        "networkMode": "bridge",
+        "portMappings": [
+            {
+            "containerPort": 8000,
+            "hostPort": 8000
+            }
+        ],
+        "environment": [
+            {
+            "name": "TESTE_VAR",
+            "value": "teste"
+            }
+        ],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "teste_servico-log",
+                "awslogs-region": "sa-east-1",
+                "awslogs-stream-prefix": "teste"
+            }
+        }
+    }
+]
