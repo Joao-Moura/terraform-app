@@ -8,6 +8,23 @@ provider "aws" {
 }
 
 // Descomentar para caso tiver o s3 configurado
+/* terraform {
+  backend "s3" {
+    encrypt = true
+    profile = "teste"
+    region  = "us-east-1"
+    bucket  = "teste-terraform-state"
+    key     = "environments/qa/ecs-cluster/terraform.tfstate"
+  }
+} */
+
+terraform {
+  backend "local" {
+    path = "./terraform.tfstate"
+  }
+}
+
+// Descomentar para caso tiver o s3 configurado
 /* data "terraform_remote_state" "ecs_cluster" {
   backend = "s3"
 
@@ -17,11 +34,37 @@ provider "aws" {
     bucket  = "teste-terraform-state"
     key     = "environments/qa/ecs-cluster/terraform.tfstate"
   }
+}
+
+data "terraform_remote_state" "ecs_service" {
+  backend = "s3"
+
+  config = {
+    profile = "teste"
+    region  = "us-east-1"
+    bucket  = "teste-terraform-state"
+    key     = "environments/qa/ecs-service/terraform.tfstate"
+  }
 } */
 
 // FIXME: Apenas para teste
 locals {
   cluster_name = "teste_cluster"
+  service_name = "teste_servico"
+}
+
+module "ecs_cluster" {
+  source = "../../modules/ecs-cluster"
+  max_capacity = 2
+  min_capacity = 1
+
+  cluster_name = local.cluster_name
+  service_name = local.service_name
+
+  // ecs_cluster_name = "teste_cluster"
+  // service_name = data.terraform_remote_state.ecs_service.outputs.service_name
+
+  tags = {}
 }
 
 module "ecs_service" {
@@ -30,8 +73,11 @@ module "ecs_service" {
   ecs_cluster_name = local.cluster_name
   // ecs_cluster_name = data.terraform_remote_state.ecs_cluster.outputs.cluster_name
 
-  service_name = "teste_servico"
+  service_name = local.service_name
+  // service_name = "teste_service"
   ecs_service_count = 1
   family_name = "teste_familia"
   container_definition = file("./container_definition.json")
+
+  depends_on = [module.ecs_cluster]
 }
