@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "sa-east-1"
+  region                      = "sa-east-1"
   skip_credentials_validation = true
   skip_requesting_account_id  = true
   skip_metadata_api_check     = true
@@ -45,6 +45,17 @@ data "terraform_remote_state" "ecs_service" {
     bucket  = "teste-terraform-state"
     key     = "environments/qa/ecs-service/terraform.tfstate"
   }
+}
+
+data "terraform_remote_state" "vpc" {
+  backend = "s3"
+
+  config = {
+    profile = "teste"
+    region  = "us-east-1"
+    bucket  = "teste-terraform-state"
+    key     = "environments/qa/vpc/terraform.tfstate"
+  }
 } */
 
 // FIXME: Apenas para teste
@@ -53,8 +64,12 @@ locals {
   service_name = "teste_servico"
 }
 
+module "vpc" {
+  source = "./vpc"
+}
+
 module "ecs_cluster" {
-  source = "../../modules/ecs-cluster"
+  source       = "../../modules/ecs-cluster"
   max_capacity = 2
   min_capacity = 1
 
@@ -75,8 +90,8 @@ module "ecs_service" {
 
   service_name = local.service_name
   // service_name = "teste_service"
-  ecs_service_count = 1
-  family_name = "teste_familia"
+  ecs_service_count    = 1
+  family_name          = "teste_familia"
   container_definition = file("./container_definition.json")
 
   depends_on = [module.ecs_cluster]
